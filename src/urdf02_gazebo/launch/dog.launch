@@ -1,0 +1,23 @@
+<launch>
+
+    <!-- 创建空世界模型 -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch" >
+        <!-- <arg name="world_name" value="$(find urdf02_gazebo)/worlds/box_house.world" /> -->
+    </include>
+    <!-- 加载机器人模型描述参数，对应自己的功能包和文件结构 -->
+    <param name="robot_description" textfile="$(find urdf02_gazebo)/urdf/dog.urdf"/>
+    <!-- 运行joint_state_publisher节点，发布机器人的关节状态  -->
+
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+    <!-- 运行robot_state_publisher节点，发布tf  -->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen">
+      <remap from="/joint_states" to="/toydog/joint_states" />
+    </node>
+    <!-- 载入YAML文件 -->
+    <rosparam file="$(find urdf02_gazebo)/urdf/toydog_control.yaml" command="load"/>
+    <!-- 启用controller -->
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" ns="toydog" args="joint_state_controller joint1_position_controller joint2_position_controller joint3_position_controller joint4_position_controller joint5_position_controller joint6_position_controller joint7_position_controller joint8_position_controller"/>
+    <!-- 在gazebo中加载机器人模型-->
+    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" args="-urdf -model mrobot_chassis -param robot_description"/> 
+
+</launch>
