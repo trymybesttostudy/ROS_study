@@ -1,27 +1,43 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+import cv2 as cv
 
 
 # 读取图片
 def ReadImg():
-    img = cv2.imread('222.jpg', 1)
+    img = cv2.imread('img.png', 1)
     plt.imshow(img)
-    plt.show()
     return img
 
+
+# 腐蚀运算
+def erode(src):
+    # 创建核结构
+    kernel = np.ones((5, 5), np.uint8)
+    # 图像腐蚀
+    erosion = cv.erode(src, kernel)
+    return erosion
+
+
+# 膨胀运算
+def dilate(src):
+    # 创建核结构
+    kernel = np.ones((5, 5), np.uint8)
+    # 图像腐蚀
+    dilate = cv.dilate(src, kernel)
+    return dilate
 
 # 高斯滤波
 def GausBlur(src):
     dst = cv2.GaussianBlur(src, (5, 5), 1.5)
-    cv2.imshow('GausBlur', dst)
+    plt.imshow(dst)
     return dst
 
 
 # 灰度处理
 def Gray_img(src):
     gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
-    cv2.imshow('gray', gray)
     return gray
 
 
@@ -29,7 +45,6 @@ def Gray_img(src):
 def threshold_img(src):
     ret, binary = cv2.threshold(src, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_TRIANGLE)
     print("threshold value %s" % ret)
-    cv2.imshow('threshold', binary)
     return binary
 
 
@@ -37,19 +52,19 @@ def threshold_img(src):
 def open_mor(src):
     kernel = np.ones((5, 5), np.uint8)
     opening = cv2.morphologyEx(src, cv2.MORPH_OPEN, kernel, iterations=3)  # iterations进行3次操作
-    cv2.imshow('open', opening)
     return opening
 
 
 # 轮廓拟合
 def draw_shape(open_img, gray_img):
-    im2, contours, hierarchy = cv2.findContours(open_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    contours, hierarchy = cv2.findContours(open_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     cnt = contours[0]  # 得到第一个的轮廓
 
     rect = cv2.minAreaRect(cnt)
     box = cv2.boxPoints(rect)
-    box = np.int0(box)
-    cv2.drawContours(src, [box], 0, (0, 0, 255), 3)  # 画矩形框
+    box = np.intp(box)
+    src = ReadImg()
+    cv2.drawContours(src, [box], -1, (0, 0, 255), 3)  # 画矩形框
 
     # 图像轮廓及中心点坐标
     M = cv2.moments(cnt)  # 计算第一条轮廓的各阶矩,字典形式
@@ -64,7 +79,19 @@ def draw_shape(open_img, gray_img):
 
 
 src = ReadImg()
-plt.imshow(src)
+gaus_img = GausBlur(src)
+gray_img = Gray_img(gaus_img)
+thres_img = threshold_img(gray_img)
+open_img = open_mor(thres_img)
+draw_shape(open_img, src)
+
+
+###################################
+#plt.subplot(1, 1, 1),    plt.imshow(src),                   plt.title('read')              # 轮廓点绘制的颜色通道是BGR; 但是Matplotlib是RGB;
+plt.subplot(1, 4, 1),    plt.imshow(gray_img),              plt.title('gray_img')           # 故在绘图时，(0, 0, 255)会由BGR转换为RGB（红 - 蓝）
+plt.subplot(1, 4, 2),    plt.imshow(thres_img),             plt.title('thres_img')
+plt.subplot(1, 4, 3),    plt.imshow(open_img),              plt.title('open_img')
+plt.subplot(1, 4, 4),    plt.imshow(src),                   plt.title('answer')
 plt.show()
 
 """######################################################################
@@ -110,5 +137,20 @@ plt.show()
 #       (x+w, y+h)：     矩形的宽高
 #       (0,0,225)：      矩形的边框颜色；
 #       2：              矩形边框宽度
-######################################################################"""
+######################################################################
+# cv2.putText(image, text, (5,50 ), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 255), 2)
+
+位置参数说明：
+
+        image = 图片
+        text = 要添加的文字
+        () = 文字添加到图片上的位置
+        字体的类型
+        字体大小
+        字体颜色
+        字体粗细
+######################################################################
+
+"""
+
 
