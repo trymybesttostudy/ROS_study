@@ -1,0 +1,189 @@
+# 就读大学：武汉理工大学
+# 作   者：黄园凯
+# 开发时间：2023/4/6 下午3:36
+# 就读大学：武汉理工大学
+# 作   者：黄园凯
+# 开发时间：2023/4/6 下午2:56
+import matplotlib.pyplot as plt
+import numpy as np
+import random
+import cv2
+import cv2 as cv
+
+
+# 读取图片
+def ReadImg():
+    # img = cv2.imread('text.jpg', 1)
+    img = des3
+    return img
+
+
+# 腐蚀运算
+def erode(src):
+    # 创建核结构
+    kernel = np.ones((5, 5), np.uint8)
+    # 图像腐蚀 g
+    erosion = cv.erode(src, kernel)
+    return erosion
+
+
+# 膨胀运算
+def dilate(src):
+    # 创建核结构
+    kernel = np.ones((5, 5), np.uint8)
+    # 图像腐蚀
+    dilate = cv.dilate(src, kernel)
+    return dilate
+
+# 高斯滤波
+def GausBlur(src):
+    dst = cv2.GaussianBlur(src, (5, 5), 1.5)
+    plt.imshow(dst)
+    return dst
+
+
+# 灰度处理
+def Gray_img(src):
+    gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
+    return gray
+
+
+# 二值化
+def threshold_img(src):
+    ret, binary = cv2.threshold(src, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_TRIANGLE)
+    print("threshold value %s" % ret)
+    return binary
+
+
+# 开运算操作
+def open_mor(src):
+    kernel = np.ones((5, 5), np.uint8)
+    opening = cv2.morphologyEx(src, cv2.MORPH_OPEN, kernel, iterations=3)  # iterations进行3次操作
+    return opening
+
+
+# 轮廓拟合
+def draw_shape(open_img):
+    # （1）图像轮廓检测
+    draw_img1 = des4.copy()
+    contours, hierarchy = cv2.findContours(open_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    cnt = contours[0]  # 得到第一个的轮廓
+
+    # rect = cv2.minAreaRect(cnt)
+    # box = cv2.boxPoints(rect)
+    # box = np.intp(box)
+    # src = ReadImg()
+    # cv2.drawContours(src, [box], -1, (0, 0, 255), 3)  # 画矩形框
+
+    # 画出图像的轮廓(在图像上) —— 注意：图像需要copy(), 否则原图会随之一起改变。
+    res1 = cv2.drawContours(draw_img1, contours, -1, (0, 0, 255), 2)
+    # 图像轮廓及中心点坐标
+    M = cv2.moments(cnt)  # 计算第一条轮廓的各阶矩,字典形式
+    center_x = int(M['m10'] / M['m00'])
+    center_y = int(M['m01'] / M['m00'])
+    print('center_x:', center_x)
+    print('center_y:', center_y)
+    cv2.circle(res1, (center_x, center_y), 7, 128, -1)  # 绘制中心点
+    str1 = '(' + str(center_x) + ',' + str(center_y) + ')'  # 把坐标转化为字符串
+    cv2.putText(res1, str1, (center_x - 50, center_y + 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2,
+                cv2.LINE_AA)  # 绘制坐标点位
+    return res1
+
+# 颜色识别——01
+def ColorFindContours(srcImage, iLowH, iHighH, iLowS, iHighS, iLowV, iHighV):
+    # 转为HSV
+    imgHSV = cv2.cvtColor(srcImage, cv2.COLOR_BGR2HSV)
+    bufImg = cv2.inRange(imgHSV, np.array((iLowH, iLowS, iLowV)), np.array((iHighH, iHighS, iHighV)))
+    return bufImg
+
+# 颜色识别——02
+def ColorFindContours2(srcImage):
+    des1 = ColorFindContours(srcImage,
+        350 / 2, 360 / 2,        # 色调最小值~最大值
+        (int)(255 * 0.70), 255,  # 饱和度最小值~最大值
+        (int)(255 * 0.60), 255)  # 亮度最小值~最大值
+
+    des2 = ColorFindContours(srcImage,
+        0, (int)(16 / 2),        # 色调最小值~最大值
+        (int)(255 * 0.70), 255,  # 饱和度最小值~最大值
+        (int)(255 * 0.60), 255)  # 亮度最小值~最大值
+
+    return des1 + des2
+
+
+def ColorFindContours(srcImage, iLowH, iHighH, iLowS, iHighS, iLowV, iHighV):
+    # 转为HSV
+    imgHSV = cv.cvtColor(srcImage, cv.COLOR_BGR2HSV)
+    bufImg = cv.inRange(imgHSV, np.array((iLowH, iLowS, iLowV)), np.array((iHighH, iHighS, iHighV)))
+    return bufImg
+
+
+def dilate(src):
+    # 创建核结构
+    kernel = np.ones((5, 5), np.uint8)
+    # 图像腐蚀
+    dilate = cv.dilate(src, kernel)
+    return dilate
+
+
+def ColorFindContours2(srcImage):
+    des1 = ColorFindContours(srcImage,
+        350 / 2, 360 / 2,        # 色调最小值~最大值
+        (int)(255 * 0.70), 255,  # 饱和度最小值~最大值
+        (int)(255 * 0.60), 255)  # 亮度最小值~最大值
+
+    des2 = ColorFindContours(srcImage,
+        0, (int)(16 / 2),        # 色调最小值~最大值
+        (int)(255 * 0.70), 255,  # 饱和度最小值~最大值
+        (int)(255 * 0.60), 255)  # 亮度最小值~最大值
+
+    return des1 + des2
+
+
+# 以灰度模式载入图像并显示
+srcImage = cv.imread("/home/spy/PycharmProjects/opencv_study/color.jpg")
+# # 显示原图
+# plt.imshow(srcImage)
+# plt.show()
+
+des = ColorFindContours(srcImage,
+    45 / 2, 60 / 2,           # 色调最小值~最大值
+    (int)(255 * 0.60), 255,   # 饱和度最小值~最大值
+    (int)(255 * 0.90), 255)  # 亮度最小值~最大值
+
+des = ColorFindContours2(srcImage)
+des1 = dilate(des)
+des2 = dilate(des1)
+des3 = dilate(des2)
+des4 = dilate(des3)
+# plt.imshow(des4)
+# plt.show()
+
+
+src = des3
+# gaus_img = GausBlur(src)
+# gray_img = Gray_img(gaus_img)
+# thres_img = threshold_img(gray_img)
+# open_img = open_mor(thres_img)
+res1 = draw_shape(des3)
+
+plt.figure()                    # 创建画布
+# plt.subplot(2, 3, 1)
+# plt.imshow(src)     # 展示原图
+# plt.title('read')
+# plt.subplot(2, 3, 2)
+# plt.imshow(gray_img)            # 灰度图
+# print(gray_img.shape)
+# plt.title('gray_img')
+# plt.subplot(2, 3, 3)
+# plt.imshow(thres_img)           # 二值化
+# plt.title('thres_img')
+# plt.subplot(2, 3, 4)
+# plt.imshow(open_img)            # 开运算
+# plt.title('open_img')
+# plt.subplot(2, 3, 5)
+plt.imshow(res1)     # 轮廓图（# 轮廓点绘制的颜色通道是BGR; 但是Matplotlib是RGB;故在绘图时，(0, 0, 255)会由BGR转换为RGB（红 - 蓝））
+plt.title('answer')
+plt.show()
+
+
