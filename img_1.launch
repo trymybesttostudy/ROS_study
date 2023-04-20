@@ -1,0 +1,16 @@
+<launch >
+    <!--节点对应对象：node，节点控制
+        节点启动的功能包：pkg
+        节点类型： type
+        设置节点名称：name
+        日志输出目标：output
+    -->
+    <!--乌龟启动的节点-->
+    <node  pkg = "opencv_cam" type = "imgpublisher_c" name = "pub_opencv"  respawn = "true"/>
+    <!--键盘控制节点-->
+    <node  pkg = "opencv_cam" type = "opencv_py.py" name = "sub_opencv" output = "screen" />
+    <!--respawn = "true" ：自动重启，当节点关闭会自动重新启动-->
+    <!--required = true" ：节点关闭后，关闭整个系统-->
+    <!--ns = "hello" ：设置节点的命名空间（避免重名问题）-->
+    <!--deprecated = "此文件已经过时了，不建议使用！"-->
+</launch>  
