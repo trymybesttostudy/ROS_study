@@ -10,10 +10,9 @@ from cv_bridge import CvBridge , CvBridgeError
 import time
 
 if __name__=="__main__":
-    capture = cv2.VideoCapture(0) # 定义摄像头
-    rospy.init_node('pub_opencv', anonymous=True) #定义节点
+    capture = cv2.VideoCapture(-1) # 定义摄像头
+    rospy.init_node('camera_node', anonymous=True) #定义节点
     image_pub=rospy.Publisher('camera/image', Image, queue_size = 1) #定义话题
-
 
     while not rospy.is_shutdown():    # Ctrl C正常退出，如果异常退出会报错device busy！
         start = time.time()
@@ -26,8 +25,8 @@ if __name__=="__main__":
             header = Header(stamp = rospy.Time.now())
             header.frame_id = "Camera"
             ros_frame.header=header
-            ros_frame.width = 2048
-            ros_frame.height = 1536
+            ros_frame.width = 640
+            ros_frame.height = 480
             ros_frame.encoding = "bgr8"
             ros_frame.step = 1920
             ros_frame.data = np.array(frame).tostring() #图片格式转换
